@@ -4,21 +4,20 @@ import plotly.express as px
 import numpy as np
 import os
 
-
 # ============================================================
-# PAGE CONFIGURATION
+# MATERIAL SELECTION STUDIO
+# Streamlit Web Application
 # ============================================================
 
 st.set_page_config(
     page_title="Material Selection Studio",
-    page_icon="⚙️",
+    page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-
 # ============================================================
-# COSMIC / NEON STYLE
+# COSMIC / NEON UI
 # ============================================================
 
 st.markdown("""
@@ -26,133 +25,66 @@ st.markdown("""
 
 .stApp {
     background:
-        radial-gradient(circle at 10% 10%, rgba(80, 40, 150, 0.28), transparent 30%),
-        radial-gradient(circle at 90% 20%, rgba(0, 180, 255, 0.18), transparent 30%),
-        radial-gradient(circle at 50% 100%, rgba(220, 0, 150, 0.18), transparent 35%),
-        linear-gradient(135deg, #080b18 0%, #11152d 50%, #080b18 100%);
-    color: #f2f4ff;
+        radial-gradient(circle at 10% 10%, rgba(80, 0, 180, 0.28), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(0, 200, 255, 0.18), transparent 35%),
+        radial-gradient(circle at 50% 100%, rgba(255, 0, 150, 0.14), transparent 40%),
+        linear-gradient(135deg, #050014 0%, #09001f 45%, #020817 100%);
+    color: white;
 }
 
 .block-container {
     padding-top: 2rem;
     padding-bottom: 3rem;
-    max-width: 1500px;
 }
 
-/* Main title */
-
-.hero-title {
-    font-size: 3rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    background: linear-gradient(
-        90deg,
-        #6ee7ff,
-        #9b7cff,
-        #ff5fc8
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0;
+h1, h2, h3 {
+    color: white !important;
 }
 
-.hero-subtitle {
-    color: #aeb7d8;
-    font-size: 1.05rem;
-    margin-top: 0.2rem;
-    margin-bottom: 1.5rem;
+p, label, .stMarkdown {
+    color: #e8e8f5;
 }
 
-/* Cards */
-
-.neon-card {
-    background: rgba(20, 24, 50, 0.72);
-    border: 1px solid rgba(126, 105, 255, 0.35);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow:
-        0 0 25px rgba(85, 60, 255, 0.08),
-        inset 0 0 20px rgba(255,255,255,0.015);
-}
-
-.metric-card {
-    background: linear-gradient(
-        135deg,
-        rgba(30, 35, 70, 0.85),
-        rgba(17, 22, 45, 0.85)
-    );
-    border: 1px solid rgba(100, 200, 255, 0.22);
-    border-radius: 16px;
-    padding: 18px;
-    text-align: center;
-}
-
-.metric-number {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #72ddff;
-}
-
-.metric-label {
-    color: #9fa9c8;
-    font-size: 0.85rem;
-}
-
-/* Sidebar */
-
-section[data-testid="stSidebar"] {
+[data-testid="stSidebar"] {
     background:
-        linear-gradient(
-            180deg,
-            rgba(13, 16, 36, 0.98),
-            rgba(18, 13, 38, 0.98)
-        );
-    border-right: 1px solid rgba(120, 100, 255, 0.25);
+        linear-gradient(180deg, #08001d 0%, #050014 100%);
+    border-right: 1px solid rgba(150, 100, 255, 0.25);
 }
 
-/* Buttons */
+[data-testid="stSidebar"] * {
+    color: white !important;
+}
 
-.stButton > button {
+div[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(150,100,255,0.25);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+div.stButton > button {
     border-radius: 10px;
-    border: 1px solid rgba(100, 220, 255, 0.35);
-    background: rgba(35, 40, 80, 0.8);
+    border: 1px solid rgba(150,100,255,0.5);
+    background: linear-gradient(90deg, #24105c, #4a147e);
     color: white;
-    font-weight: 600;
 }
 
-.stButton > button:hover {
-    border-color: #67e8f9;
-    color: #67e8f9;
-    box-shadow: 0 0 15px rgba(103,232,249,0.18);
+div.stButton > button:hover {
+    border-color: #00d9ff;
+    color: white;
 }
 
-/* Tabs */
-
-button[data-baseweb="tab"] {
-    color: #aab3d0 !important;
+.stSelectbox, .stMultiSelect, .stTextInput,
+.stNumberInput, .stSlider {
+    color: white;
 }
 
-button[data-baseweb="tab"][aria-selected="true"] {
-    color: #6ee7ff !important;
+div[data-baseweb="select"] > div {
+    background-color: rgba(15, 8, 40, 0.95);
 }
 
-/* Dataframes */
-
-div[data-testid="stDataFrame"] {
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-/* Expander */
-
-.streamlit-expanderHeader {
-    color: #dfe7ff !important;
-}
-
-/* Divider */
-
-hr {
-    border-color: rgba(130, 120, 255, 0.20);
+div[data-baseweb="input"] > div {
+    background-color: rgba(15, 8, 40, 0.95);
 }
 
 </style>
@@ -160,64 +92,21 @@ hr {
 
 
 # ============================================================
-# MATERIAL DATABASE
+# LOAD DATABASE
 # ============================================================
 
-MATERIAL_DATA = [
-    # Metals
-    ["Aluminum 6061-T6", "Metal", 2.70, 68.9, 276, 310, 167, 5.0, 0.33],
-    ["Aluminum 7075-T6", "Metal", 2.81, 71.7, 503, 572, 130, 7.0, 0.33],
-    ["Mild Steel", "Metal", 7.85, 200, 250, 400, 50, 1.5, 0.30],
-    ["Stainless Steel 304", "Metal", 8.00, 193, 215, 505, 16, 5.0, 0.29],
-    ["Stainless Steel 316", "Metal", 8.00, 193, 290, 580, 14, 6.0, 0.30],
-    ["Titanium Grade 5", "Metal", 4.43, 114, 880, 950, 7.2, 35.0, 0.34],
-    ["Copper", "Metal", 8.96, 117, 70, 220, 401, 10.0, 0.34],
-    ["Brass", "Metal", 8.50, 100, 200, 350, 120, 8.0, 0.34],
-    ["Cast Iron", "Metal", 7.20, 110, 250, 400, 50, 1.8, 0.26],
-    ["Magnesium AZ31B", "Metal", 1.77, 45, 200, 290, 96, 8.0, 0.35],
+DATA_FILE = "materials.csv"
 
-    # Polymers
-    ["ABS", "Polymer", 1.04, 2.3, 40, 45, 0.18, 2.5, 0.35],
-    ["Nylon 6", "Polymer", 1.14, 2.8, 70, 75, 0.25, 4.0, 0.39],
-    ["Polycarbonate", "Polymer", 1.20, 2.4, 65, 70, 0.20, 3.5, 0.37],
-    ["PEEK", "Polymer", 1.32, 3.6, 100, 100, 0.25, 80.0, 0.38],
-    ["HDPE", "Polymer", 0.95, 0.8, 25, 30, 0.50, 2.0, 0.46],
-    ["LDPE", "Polymer", 0.92, 0.2, 8, 12, 0.33, 2.0, 0.46],
-    ["PP", "Polymer", 0.90, 1.5, 30, 35, 0.22, 2.2, 0.42],
-    ["PVC Rigid", "Polymer", 1.40, 3.0, 50, 55, 0.17, 2.5, 0.40],
-    ["PTFE", "Polymer", 2.20, 0.5, 15, 25, 0.25, 10.0, 0.46],
-    ["PEI", "Polymer", 1.27, 3.2, 110, 110, 0.22, 25.0, 0.36],
+if not os.path.exists(DATA_FILE):
+    st.error(
+        "materials.csv was not found. "
+        "Place materials.csv in the same folder as app.py."
+    )
+    st.stop()
 
-    # Composites
-    ["Carbon Fiber/Epoxy", "Composite", 1.55, 70, 600, 900, 5.0, 25.0, 0.30],
-    ["Glass Fiber/Polyester", "Composite", 1.80, 25, 300, 500, 0.30, 8.0, 0.30],
-    ["Glass Fiber/Epoxy", "Composite", 1.90, 35, 450, 700, 0.35, 12.0, 0.30],
-    ["Aramid/Epoxy", "Composite", 1.35, 50, 500, 900, 0.20, 30.0, 0.35],
-    ["GFRP Pultruded", "Composite", 1.90, 30, 350, 600, 0.35, 7.0, 0.28],
-    ["CFRP", "Composite", 1.60, 120, 800, 1500, 5.5, 40.0, 0.28],
+df = pd.read_csv(DATA_FILE)
 
-    # Wood
-    ["Oak", "Wood", 0.70, 11, 50, 100, 0.17, 4.0, 0.35],
-    ["Pine", "Wood", 0.50, 9, 35, 70, 0.12, 2.0, 0.35],
-    ["Balsa", "Wood", 0.16, 3.0, 10, 15, 0.06, 8.0, 0.30],
-    ["Birch", "Wood", 0.65, 13, 55, 110, 0.18, 3.5, 0.35],
-
-    # Ceramics
-    ["Concrete", "Ceramic", 2.40, 30, 20, 5, 1.70, 0.15, 0.20],
-    ["Alumina", "Ceramic", 3.90, 380, 300, 300, 25, 5.0, 0.22],
-    ["Silicon Carbide", "Ceramic", 3.10, 410, 350, 350, 120, 20.0, 0.17],
-    ["Glass", "Ceramic", 2.50, 70, 40, 50, 1.0, 1.0, 0.22],
-
-    # Other
-    ["Epoxy Resin", "Polymer", 1.20, 3.0, 50, 60, 0.20, 4.0, 0.35],
-    ["Silicone Rubber", "Elastomer", 1.10, 0.01, 5, 8, 0.20, 8.0, 0.49],
-    ["Natural Rubber", "Elastomer", 0.93, 0.005, 20, 25, 0.13, 3.0, 0.49],
-    ["Neoprene", "Elastomer", 1.23, 0.01, 15, 20, 0.20, 5.0, 0.49],
-    ["Cork", "Natural", 0.24, 0.03, 2, 3, 0.04, 3.0, 0.30],
-    ["Bamboo", "Natural", 0.70, 20, 80, 160, 0.15, 3.0, 0.35],
-]
-
-COLUMNS = [
+expected_columns = [
     "Material",
     "Family",
     "Density",
@@ -229,7 +118,24 @@ COLUMNS = [
     "Poisson Ratio"
 ]
 
-df = pd.DataFrame(MATERIAL_DATA, columns=COLUMNS)
+missing = [c for c in expected_columns if c not in df.columns]
+
+if missing:
+    st.error(f"Missing columns in materials.csv: {missing}")
+    st.stop()
+
+numeric_columns = [
+    "Density",
+    "Young's Modulus",
+    "Yield Strength",
+    "Tensile Strength",
+    "Thermal Conductivity",
+    "Cost",
+    "Poisson Ratio"
+]
+
+for col in numeric_columns:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
 
 
 # ============================================================
@@ -243,360 +149,237 @@ if "selected_materials" not in st.session_state:
     st.session_state.selected_materials = []
 
 
-materials = st.session_state.materials
-
-
-# ============================================================
-# PROPERTY INFORMATION
-# ============================================================
-
-PROPERTY_INFO = {
-    "Density": ("Density", "g/cm³"),
-    "Young's Modulus": ("Young's Modulus", "GPa"),
-    "Yield Strength": ("Yield Strength", "MPa"),
-    "Tensile Strength": ("Tensile Strength", "MPa"),
-    "Thermal Conductivity": ("Thermal Conductivity", "W/m·K"),
-    "Cost": ("Relative Cost", "$/kg"),
-    "Poisson Ratio": ("Poisson Ratio", "")
-}
-
-
-FAMILY_COLORS = {
-    "Metal": "#4cc9f0",
-    "Polymer": "#f72585",
-    "Composite": "#7209b7",
-    "Wood": "#f4a261",
-    "Ceramic": "#90be6d",
-    "Elastomer": "#ffca3a",
-    "Natural": "#43aa8b"
-}
-
-
 # ============================================================
 # HEADER
 # ============================================================
 
-st.markdown(
-    '<div class="hero-title">Material Selection Studio</div>',
-    unsafe_allow_html=True
-)
+st.title("🔬 Material Selection Studio")
 
 st.markdown(
-    '<div class="hero-subtitle">'
-    'Interactive materials database, comparison, Ashby-style plotting, '
-    'and multi-criteria screening'
-    '</div>',
-    unsafe_allow_html=True
+    """
+    **Interactive materials database, comparison, Ashby plotting,
+    screening, and material-selection tool.**
+    """
 )
+
+st.markdown("---")
 
 
 # ============================================================
 # SIDEBAR
 # ============================================================
 
-with st.sidebar:
+st.sidebar.title("🧭 Navigation")
 
-    st.markdown("## ⚙️ Material Selection")
+page = st.sidebar.radio(
+    "Go to",
+    [
+        "Database",
+        "Compare",
+        "Ashby Plot",
+        "Screening",
+        "⭐ Material Selection"
+    ]
+)
 
-    page = st.radio(
-        "Navigate",
-        [
-            "🗃️ Database",
-            "📊 Compare",
-            "📈 Ashby Plot",
-            "🎯 Screening"
-        ]
-    )
+st.sidebar.markdown("---")
 
-    st.divider()
-
-    st.markdown("### Database")
-
-    st.metric(
-        "Materials",
-        len(materials)
-    )
-
-    st.metric(
-        "Families",
-        materials["Family"].nunique()
-    )
-
-    st.divider()
-
-    st.caption(
-        "Educational material-selection tool. "
-        "Property values are illustrative and should be verified "
-        "against appropriate engineering references before design use."
-    )
+st.sidebar.caption(
+    "Educational material-selection tool. "
+    "Values are illustrative and should not be treated as certified engineering data."
+)
 
 
 # ============================================================
 # DATABASE
 # ============================================================
 
-if page == "🗃️ Database":
+if page == "Database":
 
-    st.header("Materials Database")
+    st.header("📚 Material Database")
 
-    c1, c2, c3 = st.columns([2, 1, 1])
+    col1, col2 = st.columns([2, 1])
 
-    with c1:
+    with col1:
         search = st.text_input(
-            "🔎 Search",
-            placeholder="Search material name..."
+            "Search materials",
+            placeholder="e.g. aluminum, steel, polymer..."
         )
 
-    with c2:
-        family_options = ["All"] + sorted(
-            materials["Family"].unique().tolist()
+    with col2:
+        families = ["All"] + sorted(
+            st.session_state.materials["Family"].dropna().unique().tolist()
         )
 
         family = st.selectbox(
             "Family",
-            family_options
+            families
         )
 
-    with c3:
-        sort_by = st.selectbox(
-            "Sort by",
-            COLUMNS
-        )
-
-    filtered = materials.copy()
+    display_df = st.session_state.materials.copy()
 
     if search:
-        filtered = filtered[
-            filtered["Material"]
-            .str.contains(search, case=False, na=False)
-        ]
+        mask = display_df["Material"].str.contains(
+            search,
+            case=False,
+            na=False
+        )
+
+        display_df = display_df[mask]
 
     if family != "All":
-        filtered = filtered[
-            filtered["Family"] == family
+        display_df = display_df[
+            display_df["Family"] == family
         ]
 
-    filtered = filtered.sort_values(sort_by)
+    sort_column = st.selectbox(
+        "Sort by",
+        expected_columns
+    )
 
-    st.markdown(
-        f"**Showing {len(filtered)} of {len(materials)} materials**"
+    ascending = st.checkbox(
+        "Ascending",
+        value=True
+    )
+
+    display_df = display_df.sort_values(
+        sort_column,
+        ascending=ascending
     )
 
     st.dataframe(
-        filtered,
+        display_df,
         use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Density": st.column_config.NumberColumn(
-                "Density (g/cm³)",
-                format="%.2f"
-            ),
-            "Young's Modulus": st.column_config.NumberColumn(
-                "Young's Modulus (GPa)",
-                format="%.2f"
-            ),
-            "Yield Strength": st.column_config.NumberColumn(
-                "Yield Strength (MPa)",
-                format="%.0f"
-            ),
-            "Tensile Strength": st.column_config.NumberColumn(
-                "Tensile Strength (MPa)",
-                format="%.0f"
-            ),
-            "Thermal Conductivity": st.column_config.NumberColumn(
-                "Thermal Conductivity (W/m·K)",
-                format="%.2f"
-            ),
-            "Cost": st.column_config.NumberColumn(
-                "Relative Cost ($/kg)",
-                format="%.2f"
-            ),
-            "Poisson Ratio": st.column_config.NumberColumn(
-                "Poisson Ratio",
-                format="%.2f"
-            )
-        }
+        hide_index=True
     )
-
-    st.divider()
-
-    st.subheader("➕ Add Material")
-
-    with st.expander("Add a custom material"):
-
-        with st.form("add_material_form"):
-
-            a1, a2 = st.columns(2)
-
-            with a1:
-                new_name = st.text_input("Material name")
-                new_family = st.selectbox(
-                    "Family",
-                    sorted(materials["Family"].unique())
-                )
-                new_density = st.number_input(
-                    "Density (g/cm³)",
-                    min_value=0.0,
-                    value=1.0
-                )
-                new_modulus = st.number_input(
-                    "Young's Modulus (GPa)",
-                    min_value=0.0,
-                    value=1.0
-                )
-                new_yield = st.number_input(
-                    "Yield Strength (MPa)",
-                    min_value=0.0,
-                    value=10.0
-                )
-
-            with a2:
-                new_tensile = st.number_input(
-                    "Tensile Strength (MPa)",
-                    min_value=0.0,
-                    value=10.0
-                )
-                new_thermal = st.number_input(
-                    "Thermal Conductivity (W/m·K)",
-                    min_value=0.0,
-                    value=1.0
-                )
-                new_cost = st.number_input(
-                    "Relative Cost ($/kg)",
-                    min_value=0.0,
-                    value=1.0
-                )
-                new_poisson = st.number_input(
-                    "Poisson Ratio",
-                    min_value=0.0,
-                    max_value=0.5,
-                    value=0.30
-                )
-
-            submitted = st.form_submit_button(
-                "Add Material"
-            )
-
-            if submitted:
-
-                if not new_name.strip():
-                    st.error("Please enter a material name.")
-
-                elif new_name in materials["Material"].values:
-                    st.error("That material already exists.")
-
-                else:
-
-                    new_row = pd.DataFrame([[
-                        new_name,
-                        new_family,
-                        new_density,
-                        new_modulus,
-                        new_yield,
-                        new_tensile,
-                        new_thermal,
-                        new_cost,
-                        new_poisson
-                    ]], columns=COLUMNS)
-
-                    st.session_state.materials = pd.concat(
-                        [materials, new_row],
-                        ignore_index=True
-                    )
-
-                    st.success(
-                        f"{new_name} added to this session."
-                    )
-
-                    st.rerun()
-
-    st.divider()
-
-    csv_data = materials.to_csv(index=False).encode("utf-8")
 
     st.download_button(
-        "⬇️ Download Database CSV",
-        csv_data,
-        "materials_database.csv",
-        "text/csv"
+        "⬇ Download Database CSV",
+        display_df.to_csv(index=False),
+        file_name="material_database.csv",
+        mime="text/csv"
     )
+
+    st.markdown("---")
+
+    st.subheader("➕ Add Custom Material")
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        new_material = st.text_input("Material name")
+        new_family = st.selectbox(
+            "Family",
+            sorted(df["Family"].dropna().unique())
+        )
+        new_density = st.number_input(
+            "Density (g/cm³)",
+            min_value=0.0,
+            value=1.0
+        )
+        new_modulus = st.number_input(
+            "Young's Modulus (GPa)",
+            min_value=0.0,
+            value=1.0
+        )
+        new_yield = st.number_input(
+            "Yield Strength (MPa)",
+            min_value=0.0,
+            value=10.0
+        )
+
+    with c2:
+        new_tensile = st.number_input(
+            "Tensile Strength (MPa)",
+            min_value=0.0,
+            value=10.0
+        )
+        new_thermal = st.number_input(
+            "Thermal Conductivity (W/m·K)",
+            min_value=0.0,
+            value=1.0
+        )
+        new_cost = st.number_input(
+            "Cost ($/kg)",
+            min_value=0.0,
+            value=1.0
+        )
+        new_poisson = st.number_input(
+            "Poisson Ratio",
+            min_value=0.0,
+            max_value=0.5,
+            value=0.30
+        )
+
+    if st.button("Add Material"):
+
+        if not new_material.strip():
+            st.warning("Please enter a material name.")
+
+        else:
+
+            new_row = pd.DataFrame([{
+                "Material": new_material,
+                "Family": new_family,
+                "Density": new_density,
+                "Young's Modulus": new_modulus,
+                "Yield Strength": new_yield,
+                "Tensile Strength": new_tensile,
+                "Thermal Conductivity": new_thermal,
+                "Cost": new_cost,
+                "Poisson Ratio": new_poisson
+            }])
+
+            st.session_state.materials = pd.concat(
+                [st.session_state.materials, new_row],
+                ignore_index=True
+            )
+
+            st.success(f"{new_material} added for this session.")
 
 
 # ============================================================
 # COMPARE
 # ============================================================
 
-elif page == "📊 Compare":
+elif page == "Compare":
 
-    st.header("Compare Materials")
+    st.header("⚖️ Compare Materials")
 
-    material_names = materials["Material"].tolist()
-
-    selected = st.multiselect(
-        "Select materials to compare",
-        material_names,
-        default=st.session_state.selected_materials
+    materials = st.multiselect(
+        "Select materials",
+        st.session_state.materials["Material"].tolist(),
+        max_selections=10
     )
 
-    st.session_state.selected_materials = selected
+    if materials:
 
-    if not selected:
-
-        st.info(
-            "Select two or more materials above to begin a comparison."
-        )
-
-    else:
-
-        comparison = materials[
-            materials["Material"].isin(selected)
-        ].copy()
-
-        comparison = comparison.set_index("Material")
-
-        st.subheader("Property Comparison")
+        selected = st.session_state.materials[
+            st.session_state.materials["Material"].isin(materials)
+        ]
 
         st.dataframe(
-            comparison.T,
-            use_container_width=True
+            selected,
+            use_container_width=True,
+            hide_index=True
         )
 
-        st.subheader("Visual Comparison")
-
-        numeric_properties = [
-            "Density",
-            "Young's Modulus",
-            "Yield Strength",
-            "Tensile Strength",
-            "Thermal Conductivity",
-            "Cost",
-            "Poisson Ratio"
-        ]
-
-        property = st.selectbox(
-            "Property",
-            numeric_properties
+        property_choice = st.selectbox(
+            "Property to compare",
+            numeric_columns
         )
-
-        chart_data = materials[
-            materials["Material"].isin(selected)
-        ]
 
         fig = px.bar(
-            chart_data,
+            selected,
             x="Material",
-            y=property,
+            y=property_choice,
             color="Family",
-            color_discrete_map=FAMILY_COLORS,
-            title=f"{property} Comparison"
+            title=f"{property_choice} Comparison"
         )
 
         fig.update_layout(
             template="plotly_dark",
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="white"),
-            height=500
+            height=550
         )
 
         st.plotly_chart(
@@ -609,108 +392,58 @@ elif page == "📊 Compare":
 # ASHBY PLOT
 # ============================================================
 
-elif page == "📈 Ashby Plot":
+elif page == "Ashby Plot":
 
-    st.header("Ashby-Style Material Plot")
+    st.header("📈 Ashby-Style Material Plot")
 
-    properties = [
-        "Density",
-        "Young's Modulus",
-        "Yield Strength",
-        "Tensile Strength",
-        "Thermal Conductivity",
-        "Cost",
-        "Poisson Ratio"
-    ]
-
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2 = st.columns(2)
 
     with c1:
         x_property = st.selectbox(
             "X-axis",
-            properties,
+            numeric_columns,
             index=0
         )
 
     with c2:
         y_property = st.selectbox(
             "Y-axis",
-            properties,
+            numeric_columns,
             index=1
         )
 
-    with c3:
-        plot_family = st.selectbox(
-            "Family",
-            ["All"] + sorted(
-                materials["Family"].unique().tolist()
-            )
-        )
+    log_x = st.checkbox(
+        "Logarithmic X-axis"
+    )
 
-    with c4:
-        log_axes = st.checkbox(
-            "Logarithmic axes",
-            value=True
-        )
-
-    plot_df = materials.copy()
-
-    if plot_family != "All":
-        plot_df = plot_df[
-            plot_df["Family"] == plot_family
-        ]
+    log_y = st.checkbox(
+        "Logarithmic Y-axis"
+    )
 
     fig = px.scatter(
-        plot_df,
+        st.session_state.materials,
         x=x_property,
         y=y_property,
         color="Family",
         hover_name="Material",
-        color_discrete_map=FAMILY_COLORS,
-        custom_data=["Density", "Young's Modulus",
-                    "Yield Strength", "Tensile Strength",
-                    "Thermal Conductivity", "Cost",
-                    "Poisson Ratio"]
-    )
-
-    if log_axes:
-
-        fig.update_xaxes(
-            type="log"
-        )
-
-        fig.update_yaxes(
-            type="log"
-        )
-
-    fig.update_traces(
-        marker=dict(
-            size=12,
-            line=dict(
-                width=1,
-                color="rgba(255,255,255,0.5)"
-            )
-        )
+        hover_data=numeric_columns,
+        title=f"{y_property} vs {x_property}"
     )
 
     fig.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(10,15,35,0.35)",
-        font=dict(color="white"),
-        height=650,
-        legend_title="Material Family",
-        margin=dict(l=30, r=30, t=60, b=30)
+        height=650
     )
+
+    if log_x:
+        fig.update_xaxes(type="log")
+
+    if log_y:
+        fig.update_yaxes(type="log")
 
     st.plotly_chart(
         fig,
         use_container_width=True
-    )
-
-    st.info(
-        "Tip: Logarithmic axes are often useful when material properties "
-        "span several orders of magnitude."
     )
 
 
@@ -718,225 +451,438 @@ elif page == "📈 Ashby Plot":
 # SCREENING
 # ============================================================
 
-elif page == "🎯 Screening":
+elif page == "Screening":
 
-    st.header("Material Screening")
+    st.header("🔎 Material Screening")
 
-    st.markdown(
-        "Define engineering criteria and calculate a weighted screening score."
+    st.write(
+        "Apply hard constraints to eliminate materials that do not meet "
+        "your design requirements."
     )
 
-    properties = [
-        "Density",
-        "Young's Modulus",
-        "Yield Strength",
-        "Tensile Strength",
-        "Thermal Conductivity",
-        "Cost",
-        "Poisson Ratio"
-    ]
+    screening_df = st.session_state.materials.copy()
 
-    default_directions = {
-        "Density": "≤",
-        "Young's Modulus": "≥",
-        "Yield Strength": "≥",
-        "Tensile Strength": "≥",
-        "Thermal Conductivity": "≥",
-        "Cost": "≤",
-        "Poisson Ratio": "≥"
-    }
+    constraints = []
 
-    criteria = []
+    st.subheader("Constraints")
 
-    st.subheader("Criteria")
+    for prop in numeric_columns:
 
-    for prop in properties:
-
-        enabled = st.checkbox(
-            prop,
-            key=f"enable_{prop}"
+        use_constraint = st.checkbox(
+            f"Constrain {prop}",
+            key=f"screen_{prop}"
         )
 
-        if enabled:
+        if use_constraint:
 
-            unit = PROPERTY_INFO[prop][1]
-
-            c1, c2, c3 = st.columns([2, 1, 1])
+            c1, c2 = st.columns(2)
 
             with c1:
-
-                target = st.number_input(
-                    f"Target ({unit})",
-                    value=float(
-                        materials[prop].median()
-                    ),
-                    key=f"target_{prop}"
+                operator = st.selectbox(
+                    f"Requirement for {prop}",
+                    ["≤", "≥"],
+                    key=f"operator_{prop}"
                 )
 
             with c2:
-
-                direction = st.selectbox(
-                    "Direction",
-                    ["≤", "≥"],
-                    index=0 if default_directions[prop] == "≤" else 1,
-                    key=f"direction_{prop}"
+                value = st.number_input(
+                    f"Limit for {prop}",
+                    value=float(
+                        screening_df[prop].median()
+                    ),
+                    key=f"value_{prop}"
                 )
 
-            with c3:
-
-                weight = st.number_input(
-                    "Weight",
-                    min_value=0.0,
-                    value=1.0,
-                    key=f"weight_{prop}"
-                )
-
-            criteria.append(
-                {
-                    "property": prop,
-                    "target": target,
-                    "direction": direction,
-                    "weight": weight
-                }
+            constraints.append(
+                (prop, operator, value)
             )
 
-    if not criteria:
+    for prop, operator, value in constraints:
 
-        st.info(
-            "Enable one or more properties to screen the materials."
+        if operator == "≤":
+            screening_df = screening_df[
+                screening_df[prop] <= value
+            ]
+
+        else:
+            screening_df = screening_df[
+                screening_df[prop] >= value
+            ]
+
+    st.markdown("---")
+
+    st.metric(
+        "Materials Remaining",
+        len(screening_df)
+    )
+
+    st.dataframe(
+        screening_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.download_button(
+        "⬇ Download Screening Results",
+        screening_df.to_csv(index=False),
+        file_name="screened_materials.csv",
+        mime="text/csv"
+    )
+
+
+# ============================================================
+# MATERIAL SELECTION
+# ============================================================
+
+elif page == "⭐ Material Selection":
+
+    st.header("⭐ Ashby-Style Material Selection")
+
+    st.markdown(
+        """
+        ### Design → Constraints → Screening → Ranking
+
+        Use this workflow to move from a general design requirement
+        toward a ranked set of candidate materials.
+        """
+    )
+
+    st.info(
+        "The ranking score used here is a normalized educational "
+        "selection score. It is not a universal Ashby material index. "
+        "Specific engineering material indices can be added for individual "
+        "design cases."
+    )
+
+    # --------------------------------------------------------
+    # OBJECTIVE
+    # --------------------------------------------------------
+
+    st.subheader("1️⃣ Choose the Design Objective")
+
+    objective_options = {
+        "Minimize Mass / Density": {
+            "property": "Density",
+            "direction": "min"
+        },
+        "Minimize Cost": {
+            "property": "Cost",
+            "direction": "min"
+        },
+        "Maximize Stiffness": {
+            "property": "Young's Modulus",
+            "direction": "max"
+        },
+        "Maximize Yield Strength": {
+            "property": "Yield Strength",
+            "direction": "max"
+        },
+        "Maximize Tensile Strength": {
+            "property": "Tensile Strength",
+            "direction": "max"
+        },
+        "Maximize Thermal Conductivity": {
+            "property": "Thermal Conductivity",
+            "direction": "max"
+        }
+    }
+
+    objective = st.selectbox(
+        "Primary objective",
+        list(objective_options.keys())
+    )
+
+    objective_property = objective_options[objective]["property"]
+    objective_direction = objective_options[objective]["direction"]
+
+    st.write(
+        f"**Objective property:** {objective_property}"
+    )
+
+    # --------------------------------------------------------
+    # OPTIONAL FAMILY FILTER
+    # --------------------------------------------------------
+
+    st.subheader("2️⃣ Select Material Families")
+
+    all_families = sorted(
+        st.session_state.materials["Family"].dropna().unique()
+    )
+
+    selected_families = st.multiselect(
+        "Families allowed in the selection",
+        all_families,
+        default=all_families
+    )
+
+    selection_df = st.session_state.materials[
+        st.session_state.materials["Family"].isin(selected_families)
+    ].copy()
+
+    # --------------------------------------------------------
+    # CONSTRAINTS
+    # --------------------------------------------------------
+
+    st.subheader("3️⃣ Define Design Constraints")
+
+    st.caption(
+        "Only materials satisfying every selected constraint will remain."
+    )
+
+    constraints = []
+
+    constraint_columns = st.columns(2)
+
+    for i, prop in enumerate(numeric_columns):
+
+        with constraint_columns[i % 2]:
+
+            enabled = st.checkbox(
+                f"Use {prop} constraint",
+                key=f"selection_constraint_{prop}"
+            )
+
+            if enabled:
+
+                operator = st.selectbox(
+                    "Requirement",
+                    ["≤", "≥"],
+                    key=f"selection_operator_{prop}"
+                )
+
+                default_value = float(
+                    selection_df[prop].median()
+                ) if len(selection_df) else 0.0
+
+                value = st.number_input(
+                    f"Limit ({prop})",
+                    value=default_value,
+                    key=f"selection_value_{prop}"
+                )
+
+                constraints.append(
+                    (prop, operator, value)
+                )
+
+    # --------------------------------------------------------
+    # APPLY HARD CONSTRAINTS
+    # --------------------------------------------------------
+
+    screened = selection_df.copy()
+
+    for prop, operator, value in constraints:
+
+        if operator == "≤":
+            screened = screened[
+                screened[prop] <= value
+            ]
+        else:
+            screened = screened[
+                screened[prop] >= value
+            ]
+
+    # --------------------------------------------------------
+    # SCORE
+    # --------------------------------------------------------
+
+    if len(screened) > 0:
+
+        values = screened[objective_property].astype(float)
+
+        minimum = values.min()
+        maximum = values.max()
+
+        if np.isclose(maximum, minimum):
+
+            screened["Selection Score"] = 100.0
+
+        else:
+
+            if objective_direction == "max":
+
+                screened["Selection Score"] = (
+                    (values - minimum) /
+                    (maximum - minimum)
+                ) * 100
+
+            else:
+
+                screened["Selection Score"] = (
+                    (maximum - values) /
+                    (maximum - minimum)
+                ) * 100
+
+        screened = screened.sort_values(
+            "Selection Score",
+            ascending=False
+        )
+
+        # ----------------------------------------------------
+        # SUMMARY
+        # ----------------------------------------------------
+
+        st.subheader("4️⃣ Selection Results")
+
+        c1, c2, c3 = st.columns(3)
+
+        with c1:
+            st.metric(
+                "Starting Materials",
+                len(selection_df)
+            )
+
+        with c2:
+            st.metric(
+                "After Constraints",
+                len(screened)
+            )
+
+        with c3:
+            st.metric(
+                "Objective",
+                objective_property
+            )
+
+        # ----------------------------------------------------
+        # TOP CANDIDATES
+        # ----------------------------------------------------
+
+        st.subheader("🏆 Candidate Materials")
+
+        top_n = st.slider(
+            "Number of candidates to display",
+            min_value=3,
+            max_value=min(10, len(screened)),
+            value=min(5, len(screened))
+        )
+
+        top_candidates = screened.head(top_n)
+
+        st.dataframe(
+            top_candidates,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        # ----------------------------------------------------
+        # SCORE CHART
+        # ----------------------------------------------------
+
+        fig = px.bar(
+            top_candidates.sort_values(
+                "Selection Score",
+                ascending=True
+            ),
+            x="Selection Score",
+            y="Material",
+            orientation="h",
+            color="Family",
+            title="Top Candidate Selection Scores"
+        )
+
+        fig.update_layout(
+            template="plotly_dark",
+            height=max(400, top_n * 65)
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+        # ----------------------------------------------------
+        # ASHBY-STYLE VISUALIZATION
+        # ----------------------------------------------------
+
+        st.subheader("📊 Selection Map")
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            map_x = st.selectbox(
+                "Selection map X-axis",
+                numeric_columns,
+                index=numeric_columns.index(
+                    "Density"
+                )
+            )
+
+        with c2:
+            map_y = st.selectbox(
+                "Selection map Y-axis",
+                numeric_columns,
+                index=numeric_columns.index(
+                    objective_property
+                )
+            )
+
+        plot_df = selection_df.copy()
+
+        plot_df["Status"] = np.where(
+            plot_df["Material"].isin(
+                screened["Material"]
+            ),
+            "PASS",
+            "REJECTED"
+        )
+
+        fig2 = px.scatter(
+            plot_df,
+            x=map_x,
+            y=map_y,
+            color="Status",
+            symbol="Family",
+            hover_name="Material",
+            hover_data=numeric_columns,
+            title=f"Material Selection Map: {map_y} vs {map_x}"
+        )
+
+        fig2.update_layout(
+            template="plotly_dark",
+            height=650
+        )
+
+        st.plotly_chart(
+            fig2,
+            use_container_width=True
+        )
+
+        # ----------------------------------------------------
+        # DOWNLOAD
+        # ----------------------------------------------------
+
+        st.subheader("⬇ Export Results")
+
+        export_df = screened.copy()
+
+        st.download_button(
+            "Download Ranked Selection CSV",
+            export_df.to_csv(index=False),
+            file_name="material_selection_results.csv",
+            mime="text/csv"
         )
 
     else:
 
-        results = materials.copy()
+        st.warning(
+            "No materials satisfy the current constraints. "
+            "Try relaxing one or more requirements."
+        )
 
-        # Hard screening
-        for criterion in criteria:
+        st.subheader("Current Constraints")
 
-            prop = criterion["property"]
-            target = criterion["target"]
-            direction = criterion["direction"]
+        if constraints:
 
-            if direction == "≤":
-                results = results[
-                    results[prop] <= target
-                ]
-            else:
-                results = results[
-                    results[prop] >= target
-                ]
+            for prop, operator, value in constraints:
 
-        if results.empty:
-
-            st.warning(
-                "No materials satisfy all selected criteria."
-            )
+                st.write(
+                    f"• **{prop}** {operator} **{value}**"
+                )
 
         else:
 
-            st.subheader(
-                f"{len(results)} materials satisfy all criteria"
-            )
-
-            # ------------------------------------------------
-            # Weighted score
-            # ------------------------------------------------
-
-            scored = materials.copy()
-
-            scores = np.zeros(len(scored))
-
-            total_weight = sum(
-                c["weight"] for c in criteria
-            )
-
-            if total_weight == 0:
-                total_weight = 1
-
-            for criterion in criteria:
-
-                prop = criterion["property"]
-                target = criterion["target"]
-                weight = criterion["weight"]
-                direction = criterion["direction"]
-
-                values = scored[prop].astype(float)
-
-                if direction == "≤":
-
-                    ratio = target / values.replace(
-                        0, np.nan
-                    )
-
-                else:
-
-                    ratio = values / target
-
-                ratio = ratio.replace(
-                    [np.inf, -np.inf],
-                    np.nan
-                ).fillna(0)
-
-                ratio = ratio.clip(
-                    lower=0,
-                    upper=1
-                )
-
-                scores += (
-                    ratio *
-                    weight /
-                    total_weight
-                )
-
-            scored["Weighted Score"] = scores * 100
-
-            ranked = scored.sort_values(
-                "Weighted Score",
-                ascending=False
-            )
-
-            st.subheader("Weighted Screening Results")
-
-            st.dataframe(
-                ranked[
-                    [
-                        "Material",
-                        "Family",
-                        "Weighted Score"
-                    ] + [
-                        c["property"]
-                        for c in criteria
-                    ]
-                ],
-                use_container_width=True,
-                hide_index=True,
-                column_config={
-                    "Weighted Score": st.column_config.ProgressColumn(
-                        "Weighted Score",
-                        min_value=0,
-                        max_value=100,
-                        format="%.1f"
-                    )
-                }
-            )
-
-            st.subheader("Materials Passing All Criteria")
-
-            st.dataframe(
-                results,
-                use_container_width=True,
-                hide_index=True
-            )
-
-            result_csv = ranked.to_csv(
-                index=False
-            ).encode("utf-8")
-
-            st.download_button(
-                "⬇️ Download Screening Results",
-                result_csv,
-                "material_screening_results.csv",
-                "text/csv"
+            st.write(
+                "No constraints have been applied yet."
             )
 
 
@@ -944,9 +890,9 @@ elif page == "🎯 Screening":
 # FOOTER
 # ============================================================
 
-st.divider()
+st.markdown("---")
 
 st.caption(
-    "Material Selection Studio • Educational engineering materials "
-    "selection tool • Property values are illustrative"
+    "Material Selection Studio • Educational engineering tool • "
+    "Material properties are illustrative."
 )
